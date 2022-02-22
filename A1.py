@@ -14,7 +14,22 @@ def training_test_split(X, y, test_size=0.3, random_state=None):
     If `random_state` is None, then no random seed will be set.
 
     """
-    raise NotImplementedError('Your code here')
+    np.random.seed(random_state)
+    
+    test_len = int(test_size * len(y))
+    data_len = len(y)
+    
+    shuffled_array = np.arange(data_len)
+    np.random.shuffle(shuffled_array)
+    
+    y_shuffle = y[shuffled_array]
+    y_test = y_shuffle[:test_len]
+    y_train = y_shuffle[test_len:]
+    
+    X_shuffle = X[shuffled_array]
+    X_test = X_shuffle[:test_len]
+    X_train = X_shuffle[test_len:]
+    
     return X_train, X_test, y_train, y_test
 
 
@@ -33,11 +48,17 @@ def false_positives(true_labels, predicted_labels, positive_class):
 
 
 def true_negatives(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    neg_true = true_labels != positive_class
+    neg_predicted = predicted_labels != positive_class
+    match = neg_true & neg_predicted
+    return np.sum(match)
 
 
 def false_negatives(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    neg_predicted = predicted_labels != positive_class
+    pos_true = true_labels == positive_class
+    match = neg_predicted & pos_true
+    return np.sum(match)
 
 
 def precision(true_labels, predicted_labels, positive_class):
@@ -47,23 +68,35 @@ def precision(true_labels, predicted_labels, positive_class):
 
 
 def recall(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    TP = true_positives(true_labels, predicted_labels, positive_class) 
+    FN = false_negatives(true_labels, predicted_labels, positive_class)
+    return TP / (TP + FN)
 
 
 def accuracy(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    TP = true_positives(true_labels, predicted_labels, positive_class)
+    TN = true_negatives(true_labels, predicted_labels, positive_class)
+    FP = false_positives(true_labels, predicted_labels, positive_class)
+    FN = false_negatives(true_labels, predicted_labels, positive_class)
+    return (TP + TN) / (TP + TN + FP + FN)
 
 
 def specificity(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    TN = true_negatives(true_labels, predicted_labels, positive_class)
+    FP = false_positives(true_labels, predicted_labels, positive_class)
+    return TN / (TN + FP)
 
 
 def balanced_accuracy(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    TPr = recall(true_labels, predicted_labels, positive_class)
+    TNr = specificity(true_labels, predicted_labels, positive_class)
+    return (TPr + TNr) / 2
 
 
 def F1(true_labels, predicted_labels, positive_class):
-    raise NotImplementedError('Your code here')
+    p = precision(true_labels, predicted_labels, positive_class)
+    r = recall(true_labels, predicted_labels, positive_class)
+    return 2 * ((p * r) / (p + r))
 
 
 def load_data(fraction=0.75, seed=None, target_digit=9, appply_stratification=True):
